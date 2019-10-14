@@ -2,3 +2,7 @@
 MNIST-cDCGAN-model-1
 samples
 summary
+build/
+data/
+trainer.egg-info/
+dist/

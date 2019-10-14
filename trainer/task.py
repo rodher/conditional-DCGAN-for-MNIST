@@ -6,7 +6,10 @@ from train_config import TrainConfig
 from dataset_loader import DatasetLoader
 from random import randint
 import os
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 from tensorflow.python.lib.io import file_io
 from architecture import Architecture as Arch
 
