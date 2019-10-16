@@ -48,5 +48,3 @@ class Architecture:
             'padding':'valid'
         }
     ]
-    
-

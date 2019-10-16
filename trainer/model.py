@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from architecture import Architecture as Arch
+from trainer.architecture import Architecture as Arch
 
 class Model:
 

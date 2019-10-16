@@ -1,17 +1,23 @@
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(os.getcwd())
+
 import numpy as np
 import tensorflow as tf
-from model import Model
-from train_ops import TrainOps
-from train_config import TrainConfig
-from dataset_loader import DatasetLoader
+from trainer.model import Model
+from trainer.train_ops import TrainOps
+from trainer.train_config import TrainConfig
+from trainer.dataset_loader import DatasetLoader
 from random import randint
-import os
+
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
 from tensorflow.python.lib.io import file_io
-from architecture import Architecture as Arch
+from trainer.architecture import Architecture as Arch
 
 def create_training_ops():
 
@@ -198,14 +204,36 @@ def continue_training(config):
     sess, ops = load_session(config)
     train(sess, ops, config)
 
-
 # Run
 if __name__ == '__main__':
     config = TrainConfig()
     if config.sample > 0:
         sample(config)
-    elif config.should_continue:
-        continue_training(config)
     else:
-        begin_training(config)
+        train_task = continue_training if config.should_continue else begin_training
+        if config.cluster:
 
+            import dask
+            import dask.multiprocessing
+            from dask.distributed import Client
+            from dask_drmaa import SGECluster
+
+            memory = 2 ** 36
+
+            job = dask.delayed(train_task)(config)
+
+            # start cluster workers
+            cluster = SGECluster()
+            client = Client(cluster)
+            cluster.start_workers(1, memory=memory)
+            print("Web interface opened on port {}".format(client.scheduler_info()["services"]["bokeh"]))
+
+            # start the actual computation
+            results = dask.compute(job, get=client.get)
+            print(results)
+
+            # shut down all workers
+            cluster.close()
+        else:
+            res = train_task(config)
+            print(res)

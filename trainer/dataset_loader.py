@@ -5,7 +5,7 @@ try:
 except ImportError:
     from io import StringIO
 from tensorflow.python.lib.io import file_io
-from architecture import Architecture
+from trainer.architecture import Architecture
 
 class DatasetLoader:
 
@@ -26,7 +26,6 @@ class DatasetLoader:
     def _load_data(self, config):
 
         # open data file
-        # f = StringIO(file_io.read_file_to_string(config.data_dir))
         mnist = np.load(config.data_dir, allow_pickle=True)
 
         # Return numpy arrays of shapes (M, 28, 28), (M,)
