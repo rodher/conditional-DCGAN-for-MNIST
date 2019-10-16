@@ -1,7 +1,7 @@
 from setuptools import find_packages
 from setuptools import setup
 
-REQUIRED_PACKAGES = ['tensorflow>=1.7']
+REQUIRED_PACKAGES = ['tensorflow==1.14']
 
 # To train on GCP:
 # gcloud ml-engine jobs submit training job_56 --package-path trainer --module-name trainer.task --scale-tier basic-gpu --region us-central1 --staging-bucket gs://gan-training-207705_bucket2 

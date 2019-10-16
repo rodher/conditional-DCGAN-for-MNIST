@@ -1,4 +1,5 @@
 import argparse
+import os
 
 class TrainConfig:
 
@@ -13,7 +14,8 @@ class TrainConfig:
             self.CHECKPOINT_FREQ = 25
 
             if TrainConfig.is_local:
-                self.DATA_DIR = '/Users/sarahwolf/.keras/datasets/mnist.npz'
+                self.DATA_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                             '..', 'data', 'mnist.pkl')
                 self.SUMMARY_DIR = 'summary'
                 self.CHECKPOINT_DIR = 'MNIST-cDCGAN-model-1'
                 self.SAMPLE_DIR = 'samples'
@@ -23,9 +25,13 @@ class TrainConfig:
                 self.CHECKPOINT_DIR = 'gs://gan-training-207705_bucket2/cDCGAN-1/checkpoints'
                 self.SAMPLE_DIR = 'gs://gan-training-207705_bucket2/cDCGAN-1/samples'
 
-    def __init__(self):
-        args = self._add_arguments()
-        self._populate_from_args(args)
+    def __init__(self, **kwargs):
+        if kwargs:
+            for key in kwargs:
+                self.__dict__[key] = kwargs[key]
+        else:
+            args = self._add_arguments()
+            self._populate_from_args(args)
 
     def _add_arguments(self):
         parser = argparse.ArgumentParser()
@@ -43,8 +49,9 @@ class TrainConfig:
         parser.add_argument('--batch-size', help='The batch size to train with')
 
         # use-cases
-        parser.add_argument('--continue-train', help='continue training where we left off')
+        parser.add_argument('--continue-train', help='continue training where we left off', action='store_true')
         parser.add_argument('--sample', help='Sample n images from the generator')
+        parser.add_argument('--cluster', help='Train in cluster', action='store_true')
 
         args = parser.parse_args()
         return args
@@ -61,6 +68,5 @@ class TrainConfig:
         self.checkpoint_freq = args.checkpoint_freq or defaults.CHECKPOINT_FREQ
         self.should_continue = args.continue_train or False
         self.sample = args.sample or 0
+        self.cluster = args.cluster or False
         self.batch_size = args.batch_size or defaults.BATCH_SIZE
-        
-
